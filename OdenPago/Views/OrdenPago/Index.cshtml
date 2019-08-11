@@ -6,48 +6,92 @@
     <h2>Orden de Pago</h2>
 </div>
 <!--<form>-->
-<!--Controles principales-->
 <div class="row">
-    <div class="col-md-4">
-        <div class="form-group">
-            <label class="control-label" for="tipoDocumento">Tipo Documento</label>
-            <select class="form-control" id="tipoDocumento" name="tipoDocumento">
-                @foreach (string item in Model.TipoDocumento)
-                {
-                    <option value="@Html.DisplayFor(moelitem=> item)">@Html.DisplayFor(moelitem => item)</option>
-                }
-            </select>
-            <!--<input class="form-control" type="text" id="tipoDocumento" name="tipoDocumento" value="" />-->
+    <!--Controles principales-->
+    <div class="card col-md-7">
+        <div class="card-body ">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="tipoDocumento">Tipo Documento</label>
+                        <select class="form-control" id="tipoDocumento" name="tipoDocumento">
+                            @foreach (string item in Model.TipoDocumento)
+                            {
+                                <option value="@Html.DisplayFor(moelitem=> item)">@Html.DisplayFor(moelitem => item)</option>
+                            }
+                        </select>
+                        <!--<input class="form-control" type="text" id="tipoDocumento" name="tipoDocumento" value="" />-->
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="proximoNumeroDisponible">Próximo numero disponible</label>
+                        <input class="form-control" type="text" id="proximoNumeroDisponible" name="proximoNumeroDisponible" value="@Html.DisplayFor(moelitem=> Model.ProximoNumeroDisponible)" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="fecha">Fecha</label>
+                        <input class="form-control" type="date" id="fecha" name="fecha" value="@Html.DisplayFor(modelitem=> Model.Fecha)" />
+                        <div id="validatefecha" class="invalid-feedback">Campo requerido.</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label" for="detalle">Detalle</label>
+                        <input class="form-control" type="text" id="detalle" name="detalle" value="@Html.DisplayFor(modelitem=> Model.Detalle)" />
+                        <div id="validatedetalle"class="invalid-feedback">Campo requerido.</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label class="control-label" for="proximoNumeroDisponible">Próximo numero disponible</label>
-            <input class="form-control" type="text" id="proximoNumeroDisponible" name="proximoNumeroDisponible" value="@Html.DisplayFor(moelitem=> Model.ProximoNumeroDisponible)" disabled />
+    <!--Fin controles Pricipales-->
+    <!--Inicio Resumen Orden de Pago-->
+    <div class="offset-md-1 card col-md-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <h4>Resumen Orden de Pago</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" for="documentosVencidos">Documentos Vencidos</label>
+                        <label class="control-label" id="documentosVencidos">0</label>
+                        <!--<input class="form-control" type="text" id="documentosVencidos" name="documentosVencidos" value="" />-->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" for="documentosPorVencer">Documentos Por Vencer</label>
+                        <label class="control-label" id="documentosPorVencer">0</label>
+                        <!--<input class="form-control" type="text" id="documentosPorVencer" name="documentosPorVencer" value="" />-->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class="control-label" for="totalOrdenDePago">Total Orden de Pago</label>
+                        <label class="control-label" id="totalOrdenDePago">0</label>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group">
-            <label class="control-label" for="fecha">Fecha</label>
-            <input class="form-control" type="date" id="fecha" name="fecha" value="@Html.DisplayFor(modelitem=> Model.Fecha)" />
-            <div class="invalid-feedback">El campo Fecha no debe estar vacío</div>
-        </div>
-    </div>
+    <!--Fin Resumen Orden de Pago-->
 </div>
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group">
-            <label class="control-label" for="detalle">Detalle</label>
-            <input class="form-control" type="text" id="detalle" name="detalle" value="@Html.DisplayFor(modelitem=> Model.Detalle)" />
-            <div class="invalid-feedback">El campo Detalle no debe estar vacío</div>
-        </div>
-    </div>
-</div>
-<!--Fin controles Pricipales-->
+<br />
 <div class="row">
     <!--inicio Filtros de busqueda-->
-    <div class="card col-md-8">
-        <div class=" card-body ">
+    <div class="card col-md-12">
+        <div class="card-body ">
             <div class="row">
                 <div class="col-md-12">
                     <h4>Filtros Datos Origen</h4>
@@ -86,52 +130,20 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3">
+                <div class="col-md-1">
                     <div class="form-group">
                         <button id="searchFilter" class="btn btn-info">Buscar</button>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group">
+                        <button id="limpiarConsulta" class="btn btn-warning">Limpiar Consulta</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!--Fin Filtros de busqueda-->
-    <!--Inicio Resumen Orden de Pago-->
-    <div class="offset-md-1 card col-md-3">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                    <h4>Resumen Orden de Pago</h4>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="control-label" for="documentosVencidos">Documentos Vencidos</label>
-                        <label class="control-label" id="documentosVencidos">12</label>
-                        <!--<input class="form-control" type="text" id="documentosVencidos" name="documentosVencidos" value="" />-->
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="control-label" for="documentosPorVencer">Documentos Por Vencer</label>
-                        <label class="control-label" id="documentosPorVencer">12</label>
-                        <!--<input class="form-control" type="text" id="documentosPorVencer" name="documentosPorVencer" value="" />-->
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class="control-label" for="totalOrdenDePago">Total Orden de Pago</label>
-                        <label class="control-label" id="totalOrdenDePago">00</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--Fin Resumen Orden de Pago-->
 </div>
 <!--Inicio Cuentas por pagar-->
 <br />
@@ -144,19 +156,10 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    <div class="form-check">
-                        <label class="form-check-label" for="selectAll">
-                            <input type="checkbox" id="selectAll" onclick="selectAll()" class="form-check-input" value="">Seleccionar Todo
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <table class="table">
+                <table class="table" id="tableCuentasPagar">
                     <thead>
                         <tr>
-                            <th>Selección</th>
+                            <th></th>
                             <th>Sucursal</th>
                             <th>Identificación</th>
                             <th>Nombre</th>
@@ -164,23 +167,25 @@
                             <th>Documento</th>
                             <th>N° Cuota</th>
                             <th>Fecha Vencimiento</th>
+                            <th>Comprobante</th>
                             <th>Saldo Documento</th>
                         </tr>
                     </thead>
                     <tbody id="cuentaPagarFirst">
                         @for (int i = 0; i < Model.ListCuentaPorPagar.Count; i++)
                         {
-                            <tr>
-                                <td id="@Html.DisplayFor(modelitem =>i)cuentaPorPagar" class="cuentaPorPagar"><input onclick="selectCheck(@Html.DisplayFor(modelitem =>i))" type="checkbox" id="@Html.DisplayFor(modelitem =>i)selected" value=""></td>
-                                <td id="@Html.DisplayFor(modelitem =>i)Sucursal">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Sucursal)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)Identificacion">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Identificacion)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)Nombre">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Nombre)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)CuentaContable">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].CuentaContable)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)Documento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Documento)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)NumeroCuenta">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].NumeroCuenta)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)FechaVencimiento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].FechaVencimiento)</td>
-                                <td id="@Html.DisplayFor(modelitem =>i)SaldoDocumento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].SaldoDocumento)</td>
-                            </tr>
+                        <tr>
+                            <td id="@Html.DisplayFor(modelitem =>i)cuentaPorPagar" class="cuentaPorPagar"></td>
+                            <td id="@Html.DisplayFor(modelitem =>i)Sucursal">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Sucursal)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)Identificacion">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Identificacion)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)Nombre">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Nombre)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)CuentaContable">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].CuentaContable)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)Documento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Documento)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)NumeroCuenta">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].NumeroCuenta)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)FechaVencimiento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].FechaVencimiento)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)Comprobante">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Comprobante)</td>
+                            <td id="@Html.DisplayFor(modelitem =>i)SaldoDocumento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].SaldoDocumento)</td>
+                        </tr>
                         }
                     </tbody>
                 </table>
@@ -189,11 +194,6 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <button id="agregar" class="btn btn-success">Agregar</button>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <button id="limpiarConsulta" class="btn btn-warning">Limpiar Consulta</button>
                     </div>
                 </div>
             </div>
@@ -212,40 +212,14 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
-                    <div class="form-check">
-                        <label class="form-check-label" for="selectAllSecond">
-                            <input type="checkbox" id="selectAllSecond" onclick="selectAllSecond()" class="form-check-input" value="">Seleccionar Todo
-                        </label>
-                    </div>
-                </div>
+                <table id="tableSelected" class="table"></table>
             </div>
             <div class="row">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Selección</th>
-                            <th>Sucursal</th>
-                            <th>Identificación</th>
-                            <th>Nombre</th>
-                            <th>Cuenta Contable</th>
-                            <th>Documento</th>
-                            <th>N° Cuota</th>
-                            <th>Fecha Vencimiento</th>
-                            <th>Saldo Documento</th>
-                            <th>Valor a Pagar</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodySeleccionada">
-                        <tr>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div id="validatedeselected" class="invalid-feedback">Campo requerido.</div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <button id="quitarSecondSelecction" onclick="quitar()" class="btn btn-warning">Quitar</button>
+                    <button id="quitarSecondSelecction" class="btn btn-warning">Quitar</button>
                 </div>
             </div>
         </div>
@@ -257,7 +231,7 @@
 <div class="row">
     <div class="col-md-1">
         <div class="form-group">
-            <button id="guardar" onclick="sendForm('Create')" class="btn btn-info">Guardar</button>
+            <button id="guardar" class="btn btn-info">Guardar</button>
         </div>
     </div>
     <div class="col-md-1">
