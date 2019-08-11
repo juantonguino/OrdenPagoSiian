@@ -108,7 +108,7 @@ $(document).ready(() => {
         },
         'order': [[1, 'asc']]
     });
-
+    //data selected
     var tableSelected = $('#tableSelected').DataTable({
         "bFilter": true,
         "scrollX": 300,
