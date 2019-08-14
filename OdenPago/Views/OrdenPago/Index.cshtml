@@ -1,9 +1,20 @@
-﻿@model OdenPago.Models.OrdenPago
+﻿@model dynamic
 @{
     ViewBag.Title = "Index";
 }
 <div class="row">
     <h2>Orden de Pago</h2>
+</div>
+<div class="fixed-top marginFloat" align="right">
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-primary"><i class="material-icons">local_printshop</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">first_page</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">navigate_before</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">add</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">navigate_next</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">last_page</i></button>
+        <button type="button" class="btn btn-primary"><i class="material-icons">save</i></button>
+    </div>
 </div>
 <!--<form>-->
 <div class="row">
@@ -15,7 +26,7 @@
                     <div class="form-group">
                         <label class="control-label" for="tipoDocumento">Tipo Documento</label>
                         <select class="form-control" id="tipoDocumento" name="tipoDocumento">
-                            @foreach (string item in Model.TipoDocumento)
+                            @foreach (string item in Model.ordenPago.TipoDocumento)
                             {
                                 <option value="@Html.DisplayFor(moelitem=> item)">@Html.DisplayFor(moelitem => item)</option>
                             }
@@ -26,7 +37,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="proximoNumeroDisponible">Próximo numero disponible</label>
-                        <input class="form-control" type="text" id="proximoNumeroDisponible" name="proximoNumeroDisponible" value="@Html.DisplayFor(moelitem=> Model.ProximoNumeroDisponible)" disabled />
+                        <input class="form-control" type="text" id="proximoNumeroDisponible" name="proximoNumeroDisponible" value="@Model.ordenPago.ProximoNumeroDisponible" disabled />
                     </div>
                 </div>
             </div>
@@ -34,15 +45,15 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="fecha">Fecha</label>
-                        <input class="form-control" type="date" id="fecha" name="fecha" value="@Html.DisplayFor(modelitem=> Model.Fecha)" />
+                        <input class="form-control" type="date" id="fecha" name="fecha" value="@Convert.ToDateTime(Model.ordenPago.Fecha).ToString("yyyy-MM-dd")" />
                         <div id="validatefecha" class="invalid-feedback">Campo requerido.</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="detalle">Detalle</label>
-                        <input class="form-control" type="text" id="detalle" name="detalle" value="@Html.DisplayFor(modelitem=> Model.Detalle)" />
-                        <div id="validatedetalle"class="invalid-feedback">Campo requerido.</div>
+                        <input class="form-control" type="text" id="detalle" name="detalle" value="@Model.ordenPago.Detalle" />
+                        <div id="validatedetalle" class="invalid-feedback">Campo requerido.</div>
                     </div>
                 </div>
             </div>
@@ -104,10 +115,16 @@
                         <input class="form-control" type="date" id="vencimientosHasta" name="vencimientosHasta" value="" />
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label class="control-label" for="sucursal">Sucursal</label>
-                        <input class="form-control" type="text" id="sucursal" name="sucursal" value="" />
+                        <!--<input class="form-control" type="text" id="sucursal" name="sucursal" value="" />-->
+                        <select class="form-control select-custom-multiple" id="sucursal" name="sucursal[]" multiple="multiple">
+                            @foreach (string item in Model.sucursalesFilter)
+                            {
+                                <option value="@Html.DisplayFor(moelitem=> item)">@Html.DisplayFor(moelitem => item)</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="col-md-2">
@@ -116,7 +133,7 @@
                         <input class="form-control" type="text" id="comprobante" name="comprobante" value="" />
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <div class="form-group">
                         <label class="control-label" for="cuentaContable">Cuenta Contable</label>
                         <input class="form-control" type="text" id="cuentaContable" name="cuentaContable" value="" />
@@ -169,27 +186,30 @@
                             <th>Fecha Vencimiento</th>
                             <th>Comprobante</th>
                             <th>Saldo Documento</th>
+                            <th>Id</th>
                         </tr>
                     </thead>
                     <tbody id="cuentaPagarFirst">
-                        @for (int i = 0; i < Model.ListCuentaPorPagar.Count; i++)
+                        @for (int i = 0; i < Model.ordenPago.ListCuentaPorPagar.Count; i++)
                         {
-                        <tr>
-                            <td id="@Html.DisplayFor(modelitem =>i)cuentaPorPagar" class="cuentaPorPagar"></td>
-                            <td id="@Html.DisplayFor(modelitem =>i)Sucursal">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Sucursal)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)Identificacion">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Identificacion)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)Nombre">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Nombre)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)CuentaContable">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].CuentaContable)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)Documento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Documento)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)NumeroCuenta">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].NumeroCuenta)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)FechaVencimiento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].FechaVencimiento)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)Comprobante">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].Comprobante)</td>
-                            <td id="@Html.DisplayFor(modelitem =>i)SaldoDocumento">@Html.DisplayFor(modelitem => Model.ListCuentaPorPagar[i].SaldoDocumento)</td>
-                        </tr>
+                            <tr>
+                                <td id="@Html.DisplayFor(modelitem =>i)cuentaPorPagar" class="cuentaPorPagar"></td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Sucursal">@Model.ordenPago.ListCuentaPorPagar[i].Sucursal</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Identificacion">@Model.ordenPago.ListCuentaPorPagar[i].Identificacion</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Nombre">@Model.ordenPago.ListCuentaPorPagar[i].Nombre</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)CuentaContable">@Model.ordenPago.ListCuentaPorPagar[i].CuentaContable</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Documento">@Model.ordenPago.ListCuentaPorPagar[i].Documento</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)NumeroCuenta">@Model.ordenPago.ListCuentaPorPagar[i].NumeroCuenta</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)FechaVencimiento">@Convert.ToDateTime(Model.ordenPago.ListCuentaPorPagar[i].FechaVencimiento).ToString("yyyy-MM-dd")</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Comprobante">@Model.ordenPago.ListCuentaPorPagar[i].Comprobante</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)SaldoDocumento">@Model.ordenPago.ListCuentaPorPagar[i].SaldoDocumento</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Id">@Model.ordenPago.ListCuentaPorPagar[i].Id</td>
+                            </tr>
                         }
                     </tbody>
                 </table>
             </div>
+            <br />
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
@@ -212,12 +232,20 @@
                 </div>
             </div>
             <div class="row">
-                <table id="tableSelected" class="table"></table>
+                <table id="tableSelected" class="table">
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" style="text-align:right">Total Saldo de Documento:</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
             <div class="row">
                 <div id="validatedeselected" class="invalid-feedback">Campo requerido.</div>
             </div>
-            <div class="col-md-3">
+            <br/>
+            <div class="col-md-1">
                 <div class="form-group">
                     <button id="quitarSecondSelecction" class="btn btn-warning">Quitar</button>
                 </div>
@@ -236,7 +264,7 @@
     </div>
     <div class="col-md-1">
         <div class="form-group">
-            <button id="guardar" class="btn btn-success">Aprobar</button>
+            <button id="aprobar" class="btn btn-success">Aprobar</button>
         </div>
     </div>
     <div class="col-md-1">
@@ -244,9 +272,9 @@
             Generar Orden de Pago
         </button>
         <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">PorTercero</a>
+            <a class="dropdown-item" id="tercero" href="#">Por Tercero</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Total</a>
+            <a class="dropdown-item"  id="total"href="#">Total</a>
         </div>
     </div>
 </div>

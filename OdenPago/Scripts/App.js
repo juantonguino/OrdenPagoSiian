@@ -42,7 +42,8 @@ var columnsHeaders = [
     {data:"FechaVencimiento", title:"Fecha Vencimiento"},
     {data:"Comprobante", title:"Comprobante"},
     {data:"SaldoDocumento", title:"Saldo Documento"},
-    {data:"ValorPagarInput", title:"Valor a Pagar"}
+    {data: "ValorPagarInput", title: "Valor a Pagar"},
+    {data: "Id", title: "Id"}
 ];
 var errorMessageSelectedAccount = {
     cuenta: "",
@@ -50,6 +51,9 @@ var errorMessageSelectedAccount = {
     invaldValue: function () { return "En la Cuenta contable " + this.cuenta + " el valor a pagar no puede ser mayor que el saldo del documento"},
     lessZero: function(){return "En la Cuenta contable "+this.cuenta+" el valor a pagar no puede ser menor que cero o cero"}
 };
+
+var totalDocumento = 0;
+var showvalue = false;
 
 /**
  * Custom Filter
@@ -66,18 +70,20 @@ function addCustomFilter() {
         Comprobante = data[8];
         SaldoDocumento = data[9];
 
-        if (Sucursal.includes(filter.Sucursal) &&
+        if (isValueStringInArray(Sucursal, filter.Sucursal) &&
             CuentaContable.includes(filter.CuentaContable) &&
             Identificacion.includes(filter.Tercero) &&
             Comprobante.includes(filter.Comprobante)
             ) {
             if (filter.VencimientosHasta == "") {
+                //totalDocumento += intVal(SaldoDocumento);
                 return true;
             }
             else {
                 filterdate = new Date(filter.VencimientosHasta);
                 date = new Date(FechaVencimiento);
                 if (filterdate.getTime() >= date.getTime()) {
+                    //totalDocumento += intVal(SaldoDocumento);
                     return true;
                 }
             }
@@ -90,6 +96,8 @@ function addCustomFilter() {
  * Document Ready
  */
 $(document).ready(() => {
+    //select Multiple 
+    $('.select-custom-multiple').select2();
     //declaracion de la tabla
     var table = $('#tableCuentasPagar').DataTable({
         "bFilter": true,
@@ -101,6 +109,15 @@ $(document).ready(() => {
                 'checkboxes': {
                     'selectRow': true
                 }
+            },
+            {
+                "targets": [10],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": 9,
+                "className": "aling-right"
             }
         ],
         'select': {
@@ -108,11 +125,13 @@ $(document).ready(() => {
         },
         'order': [[1, 'asc']]
     });
+
     //data selected
     var tableSelected = $('#tableSelected').DataTable({
         "bFilter": true,
         "scrollX": 300,
         "language": language,
+        "fixedColumns": true,
         'columnDefs': [
             {
                 "defaultContent": "-",
@@ -120,15 +139,49 @@ $(document).ready(() => {
                 'checkboxes': {
                     'selectRow': true
                 }
+            },
+            {
+                "targets": [11],
+                "visible": false,
+                "searchable": false
+            },
+            {
+                "targets": 10,
+                "width": 150,
+            },
+            {
+                "targets": 9,
+                "className": "aling-right"
             }
+
         ],
         'select': {
             'style': 'multi'
         },
         'order': [[1, 'asc']],
         'data': CuentasPorPagarSelecciondas,
-        'columns': columnsHeaders
+        'columns': columnsHeaders,
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api(), data;
+
+            // Total over all pages
+            total = api
+                .column(9)
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            $(api.column(3).footer()).html(' $' + formatNumbrer(total));
+        }
     });
+
+
+    //ocultar elmentos
+    hideELmentTableCuentas();
+
+    //hiden selection
+    hideELmentTableSeleccion()
 
     //accion agregar
     $("#agregar").on("click", (e) => {
@@ -141,14 +194,19 @@ $(document).ready(() => {
         $("#documentosVencidos").text(getDocumentosVencidos());
         $("#documentosPorVencer").text(getDocumentosPorVencer());
         $("#totalOrdenDePago").text(getTotalOrdenPago());
+        showELmentTableSeleccion();
     });
     
     //evneto Buscar
     $("#searchFilter").on("click", (e) => {
         e.preventDefault();
+        totalDocumento = 0;
         getFilters();
         addCustomFilter();
+        table.rows().deselect();
         table.draw();
+        showvalue = true;
+        showELmentTableCuentas();
     });
 
     //lipiar busqueda
@@ -156,33 +214,91 @@ $(document).ready(() => {
         e.preventDefault();
         $.fn.dataTableExt.afnFiltering.length = 0;
         table.draw();
+
         $("#vencimientosHasta").val("");
-        $("#sucursal").val("");
+        $('.select-custom-multiple').val(null).trigger("change");
         $("#comprobante").val("");
         $("#cuentaContable").val("");
         $("#tercero").val("");
+
+        totalDocumento = 0;
+        table.rows().deselect();
+
+        $(table.column(3).footer()).html('$' + totalDocumento);
+        hideELmentTableCuentas()
+        showvalue = false;
     });
 
     //quitar elementos Ordenes Seleccionadas
     $('#quitarSecondSelecction').on('click', (e) => {
         e.preventDefault();
         rowsSelectedRemove = tableSelected.rows({ selected: true }).data();
-        console.log(rowsSelectedRemove);
         tableSelected.rows('.selected').remove().draw(false);
         removeCuentasPorPagarSelecciondas(rowsSelectedRemove);
         $("#documentosVencidos").text(getDocumentosVencidos());
         $("#documentosPorVencer").text(getDocumentosPorVencer());
         $("#totalOrdenDePago").text(getTotalOrdenPago());
+        if (CuentasPorPagarSelecciondas == 0) {
+            hideELmentTableSeleccion();
+        }
     });
 
-    //Agregar
+    //guardar()
     $("#guardar").on('click', (e) => {
         if (validateForm()) {
             sendForm("Create");
         }
     });
 
+    //controles de formulario
+    $("#guardar").on('click',(e)=>{
+        if (validateForm()) { sendForm()}
+    });
+    $("#aprobar").on('click',(e)=>{
+        if (validateForm()) { sendForm("aprobar"); }
+    });
+    $("#tercero").on('click',(e)=>{
+        if (validateForm()) { sendForm("tercero");}
+    });
+    $("#total").on('click',(e)=>{
+        if (validateForm()) { sendForm("total"); }
+    });
+
 });
+
+//hide elemnt cuentas
+function hideELmentTableCuentas() {
+    $("#tableCuentasPagar").addClass("hideElement");
+    $("#tableCuentasPagar_info").addClass("hideElement");
+    $("#tableCuentasPagar_paginate").addClass("hideElement");
+}
+
+//muestra la tabla cuentas
+function showELmentTableCuentas() {
+    $("#tableCuentasPagar").removeClass("hideElement");
+    $("#tableCuentasPagar_info").removeClass("hideElement");
+    $("#tableCuentasPagar_paginate").removeClass("hideElement");
+}
+
+//hide elemnt selección
+function hideELmentTableSeleccion() {
+    $("#tableSelected").addClass("hideElement");
+    $("#tableSelected_info").addClass("hideElement");
+    $("#tableSelected_paginate").addClass("hideElement");
+}
+
+//muestra la tabla selección
+function showELmentTableSeleccion() {
+    $("#tableSelected").removeClass("hideElement");
+    $("#tableSelected_info").removeClass("hideElement");
+    $("#tableSelected_paginate").removeClass("hideElement");
+}
+
+// Remove the formatting to get integer data for summation
+function intVal(i) {
+    return typeof i === 'string' ?i.replace(/[\$,]/g, '') * 1 :typeof i === 'number' ?i : 0;
+};
+
 /**
  * Obtinen los filetros de busqueda en las variables definidas arriba
  * */
@@ -192,6 +308,21 @@ function getFilters() {
     filter.Comprobante = $("#comprobante").val();
     filter.CuentaContable = $("#cuentaContable").val();
     filter.Tercero = $("#tercero").val();
+}
+
+/**
+ * 
+ * @param {any} value
+ * @param {any} array
+ */
+function isValueStringInArray(value, array) {
+    retorno = false;
+    for (i = 0; i < array.length && retorno == false; i++) {
+        if (value == array[i]) {
+            retorno = true;
+        }
+    }
+    return retorno;
 }
 
 /**
@@ -249,8 +380,9 @@ function getCuenta(array, index) {
     obj.FechaVencimiento = array[7];
     obj.Comprobante = array[8];
     obj.SaldoDocumento = array[9];
-    obj.ValorPagar = Math.abs(obj.SaldoDocumento);
-    obj.ValorPagarInput = '<input class="form-control" type="text" id="' + obj.Index + 'ValorPagarI" name="" value="' + obj.ValorPagar + '"/>';
+    obj.Id = array[10];
+    obj.ValorPagar = obj.SaldoDocumento;
+    obj.ValorPagarInput = '<input class="form-control aling-right" type="text" id="' + obj.Index + 'ValorPagarI" name="" value="' + obj.ValorPagar + '"/>';
     return obj;
 }
 
@@ -269,7 +401,8 @@ function isEqualAccount(obj1, obj2) {
         obj1.Documento == obj2.Documento &&
         obj1.NumeroCuenta == obj2.NumeroCuenta &&
         obj1.FechaVencimiento == obj2.FechaVencimiento &&
-        obj1.Comprobante == obj2.Comprobante
+        obj1.Comprobante == obj2.Comprobante &&
+        obj1.Id == obj2.Id
     ) { return true; } else { return false; }
 }
 
@@ -313,7 +446,7 @@ function getTotalOrdenPago() {
     for (i = 0; i < CuentasPorPagarSelecciondas.length; i++) {
         total += parseInt(CuentasPorPagarSelecciondas[i].SaldoDocumento);
     }
-    return total;
+    return CuentasPorPagarSelecciondas.length;
 }
 
 /**
@@ -324,7 +457,7 @@ function refreshDataCuentasPorPagarSelecciondas() {
     for (i = 0; i < CuentasPorPagarSelecciondas.length; i++) {
         CuentasPorPagarSelecciondas[i].ValorPagar = $("#" + obj.Index + "ValorPagarI").val();
         copy = Object.assign({}, CuentasPorPagarSelecciondas[i]);
-        copy.ValorPagarInput=""
+        copy.ValorPagarInput = "";
         toSend.push(copy);
     }
     return toSend;
@@ -381,12 +514,9 @@ function validateForm() {
         for (i = 0; i < CuentasPorPagarSelecciondas.length; i++) {
             CuentasPorPagarSelecciondas[i].ValorPagar = $("#" + CuentasPorPagarSelecciondas[i].Index + "ValorPagarI").val();
             cuenta = CuentasPorPagarSelecciondas[i].CuentaContable;
-            if (parseInt(CuentasPorPagarSelecciondas[i].ValorPagar) <= 0) {
-                errorMessageSelectedAccount.cuenta = cuenta;
-                messageErrorPrint += errorMessageSelectedAccount.lessZero()+"<br/>";
-                retorno = false;
-            }
-            else if (parseInt(CuentasPorPagarSelecciondas[i].ValorPagar) > parseInt(CuentasPorPagarSelecciondas[i].SaldoDocumento)) {
+            numeroValorPagar = Math.abs(Number(CuentasPorPagarSelecciondas[i].ValorPagar.replace(/,/g, '')));
+            numeroSaldoDocumento = Math.abs(Number(CuentasPorPagarSelecciondas[i].SaldoDocumento.replace(/,/g,'')));
+            if ( numeroValorPagar> numeroSaldoDocumento) {
                 errorMessageSelectedAccount.cuenta = cuenta;
                 messageErrorPrint += errorMessageSelectedAccount.invaldValue() + "<br/>";
                 retorno = false;
@@ -394,7 +524,10 @@ function validateForm() {
         }
         $("#validatedeselected").html(messageErrorPrint);
         $("#validatedeselected").css('display', 'block');
-        console.log(messageErrorPrint);
     }
     return retorno;
+}
+
+function formatNumbrer(number) {
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

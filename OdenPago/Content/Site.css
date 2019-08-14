@@ -19,12 +19,31 @@
 /* Set width on the form input elements since they're 100% wide by default */
 input,
 select,
+
 textarea {
     max-width: 280px;
 }
 
+/** estilos de sitio*/
+
+.hideElement {
+    display:none;
+}
+
+th {
+    white-space: nowrap;
+}
+
+.aling-right {
+    text-align: right;
+}
+
+.marginFloat {
+    margin:40px;
+}
+
 #tableCuentasPagar_filter {
-    display:none
+    display: none
 }
 
 @media (min-width: 576px) {

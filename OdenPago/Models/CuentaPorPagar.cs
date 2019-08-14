@@ -8,6 +8,7 @@ namespace OdenPago.Models
 {
     public class CuentaPorPagar
     {
+        public int Id { get; set; }
         public string Sucursal { get; set; }
         public string Identificacion { get; set; }
         public string Nombre { get; set; }

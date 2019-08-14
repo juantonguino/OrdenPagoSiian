@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Web;
@@ -18,6 +19,7 @@ namespace OdenPago.Controllers
             Detalle = "",
             ListCuentaPorPagar = new List<CuentaPorPagar> {
                 new CuentaPorPagar {
+                    Id=1,
                     Sucursal="Pasto",
                     CuentaContable="Cuenta Contable1",
                     Documento="Documento 1",
@@ -25,9 +27,10 @@ namespace OdenPago.Controllers
                     Identificacion="123567",
                     Nombre="Nombre 1",
                     NumeroCuenta="12345",
-                    SaldoDocumento="-30000",
+                    SaldoDocumento="-30,000",
                     Comprobante="comprobante 1"
                 }, new CuentaPorPagar {
+                    Id=2,
                     Sucursal="Cali",
                     CuentaContable="Cuenta Contable2",
                     Documento="Documento 2",
@@ -35,9 +38,10 @@ namespace OdenPago.Controllers
                     Identificacion="1235656",
                     Nombre="Nombre 2",
                     NumeroCuenta="12789",
-                    SaldoDocumento="100000",
+                    SaldoDocumento="100,000",
                     Comprobante="comprobante 2"
                 }, new CuentaPorPagar {
+                    Id=3,
                     Sucursal="Bogota",
                     CuentaContable="Cuenta Contable3",
                     Documento="Documento 3",
@@ -45,16 +49,21 @@ namespace OdenPago.Controllers
                     Identificacion="12345765",
                     Nombre="Nombre 3",
                     NumeroCuenta="67890123",
-                    SaldoDocumento="4000000",
+                    SaldoDocumento="4,000,000",
                     Comprobante="comprobante 3"
                 }
             }
         };
 
+        private string[] _sucursalesFilter= new string[] {"Pasto","Cali", "Bogotá"};
+
         // GET: OrdenPago
         public ActionResult Index()
         {
-            return View(_ordenPago);
+            dynamic render = new ExpandoObject();
+            render.sucursalesFilter = _sucursalesFilter;
+            render.ordenPago = _ordenPago;
+            return View(render);
         }
 
         // GET: OrdenPago/Details/5
