@@ -32,7 +32,8 @@ var language = {
     }
 };
 var columnsHeaders = [
-    {data:"", title: "" },
+    { data: "", title: "" },
+    { data: "Index", title: "Identificador" },
     {data:"Sucursal", title:"Sucursal"},
     {data:"Identificacion", title:"Identificación"},
     {data:"Nombre", title:"Nombre"},
@@ -46,10 +47,9 @@ var columnsHeaders = [
     {data: "Id", title: "Id"}
 ];
 var errorMessageSelectedAccount = {
-    cuenta: "",
+    index: "",
     empty: "Se deben seleccionar Cuentas",
-    invaldValue: function () { return "En la Cuenta contable " + this.cuenta + " el valor a pagar no puede ser mayor que el saldo del documento"},
-    lessZero: function(){return "En la Cuenta contable "+this.cuenta+" el valor a pagar no puede ser menor que cero o cero"}
+    invaldValue: function () { return "En la Cuenta con identificador " + this.index + " el valor a pagar no puede ser mayor que el saldo del documento"},
 };
 
 var totalDocumento = 0;
@@ -60,15 +60,15 @@ var showvalue = false;
  */
 function addCustomFilter() {
     $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-        Sucursal = data[1];
-        Identificacion = data[2];
-        Nombre = data[3];
-        CuentaContable = data[4];
-        Documento = data[5];
-        NumeroCuenta = data[6];
-        FechaVencimiento = data[7];
-        Comprobante = data[8];
-        SaldoDocumento = data[9];
+        Sucursal = data[2];
+        Identificacion = data[3];
+        Nombre = data[4];
+        CuentaContable = data[5];
+        Documento = data[6];
+        NumeroCuenta = data[7];
+        FechaVencimiento = data[8];
+        Comprobante = data[9];
+        SaldoDocumento = data[10];
 
         if (isValueStringInArray(Sucursal, filter.Sucursal) &&
             CuentaContable.includes(filter.CuentaContable) &&
@@ -111,19 +111,32 @@ $(document).ready(() => {
                 }
             },
             {
-                "targets": [10],
+                "targets": [11,12,13],
                 "visible": false,
                 "searchable": false
             },
             {
-                "targets": 9,
+                "targets": 10,
                 "className": "aling-right"
             }
         ],
         'select': {
             'style': 'multi'
         },
-        'order': [[1, 'asc']]
+        'order': [[1, 'asc']],
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api(), data;
+
+            // Total over all pages
+            totalDocumento = api
+                .column(10, { search: 'applied' })
+                .data()
+                .reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0);
+
+            //$(api.column(3).footer()).html(' $' + formatNumbrer(total));
+        }
     });
 
     //data selected
@@ -141,16 +154,16 @@ $(document).ready(() => {
                 }
             },
             {
-                "targets": [11],
+                "targets": [12],
                 "visible": false,
                 "searchable": false
             },
             {
                 "targets": 10,
-                "width": 150,
+                "width": 150
             },
             {
-                "targets": 9,
+                "targets": 10,
                 "className": "aling-right"
             }
 
@@ -166,7 +179,7 @@ $(document).ready(() => {
 
             // Total over all pages
             total = api
-                .column(9)
+                .column(10)
                 .data()
                 .reduce(function (a, b) {
                     return intVal(a) + intVal(b);
@@ -175,13 +188,17 @@ $(document).ready(() => {
             $(api.column(3).footer()).html(' $' + formatNumbrer(total));
         }
     });
+    //send 0 to table 
+    $(table.column(3).footer()).html('$' + 0);
 
+    //deshabilitar boton cambiar
+    $("#agregar").attr('disabled', 'disabled');
 
     //ocultar elmentos
     hideELmentTableCuentas();
 
     //hiden selection
-    hideELmentTableSeleccion()
+    hideELmentTableSeleccion();
 
     //accion agregar
     $("#agregar").on("click", (e) => {
@@ -199,19 +216,21 @@ $(document).ready(() => {
     
     //evneto Buscar
     $("#searchFilter").on("click", (e) => {
+        $("#agregar").removeAttr('disabled');
         e.preventDefault();
-        totalDocumento = 0;
         getFilters();
         addCustomFilter();
         table.rows().deselect();
         table.draw();
         showvalue = true;
         showELmentTableCuentas();
+        $(table.column(2).footer()).html(' $' + formatNumbrer(totalDocumento));
     });
 
     //lipiar busqueda
     $('#limpiarConsulta').on('click', function (e) {
         e.preventDefault();
+        $("#agregar").attr('disabled', 'disabled');
         $.fn.dataTableExt.afnFiltering.length = 0;
         table.draw();
 
@@ -220,12 +239,10 @@ $(document).ready(() => {
         $("#comprobante").val("");
         $("#cuentaContable").val("");
         $("#tercero").val("");
-
-        totalDocumento = 0;
         table.rows().deselect();
 
-        $(table.column(3).footer()).html('$' + totalDocumento);
-        hideELmentTableCuentas()
+        $(table.column(2).footer()).html('$' + 0);
+        hideELmentTableCuentas();
         showvalue = false;
     });
 
@@ -244,26 +261,32 @@ $(document).ready(() => {
     });
 
     //guardar()
-    $("#guardar").on('click', (e) => {
-        if (validateForm()) {
-            sendForm("Create");
-        }
-    });
+    //$("#guardar").on('click', (e) => {
+    //    if (validateForm()) {
+    //        sendForm("Create");
+    //    }
+    //});
 
     //controles de formulario
-    $("#guardar").on('click',(e)=>{
-        if (validateForm()) { sendForm()}
+    $("#guardar").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("Guardar")}
     });
-    $("#aprobar").on('click',(e)=>{
-        if (validateForm()) { sendForm("aprobar"); }
+    $("#aprobar").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("Aprobar"); }
     });
-    $("#tercero").on('click',(e)=>{
-        if (validateForm()) { sendForm("tercero");}
+    $("#tercero").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("GenerarTercero");}
     });
     $("#total").on('click',(e)=>{
-        if (validateForm()) { sendForm("total"); }
+        if (validateForm()) { sendForm("GenerarTotal"); }
     });
 
+    //hide error selected
+    $("#validatedeselected").css('display', 'none');
+    $("#validatedeExist").css('display', 'none');
 });
 
 //hide elemnt cuentas
@@ -271,6 +294,9 @@ function hideELmentTableCuentas() {
     $("#tableCuentasPagar").addClass("hideElement");
     $("#tableCuentasPagar_info").addClass("hideElement");
     $("#tableCuentasPagar_paginate").addClass("hideElement");
+    $(".dataTables_scrollFootInner").addClass("hideElement");
+    $("#tableCuentasPagar_wrapper").addClass("hideElement");
+    console.log($("#footerCuenta"));
 }
 
 //muestra la tabla cuentas
@@ -278,6 +304,8 @@ function showELmentTableCuentas() {
     $("#tableCuentasPagar").removeClass("hideElement");
     $("#tableCuentasPagar_info").removeClass("hideElement");
     $("#tableCuentasPagar_paginate").removeClass("hideElement");
+    $(".dataTables_scrollFootInner").removeClass("hideElement");
+    $("#tableCuentasPagar_wrapper").removeClass("hideElement");
 }
 
 //hide elemnt selección
@@ -285,6 +313,7 @@ function hideELmentTableSeleccion() {
     $("#tableSelected").addClass("hideElement");
     $("#tableSelected_info").addClass("hideElement");
     $("#tableSelected_paginate").addClass("hideElement");
+    $("#tableSelected_wrapper").addClass("hideElement");
 }
 
 //muestra la tabla selección
@@ -292,6 +321,7 @@ function showELmentTableSeleccion() {
     $("#tableSelected").removeClass("hideElement");
     $("#tableSelected_info").removeClass("hideElement");
     $("#tableSelected_paginate").removeClass("hideElement");
+    $("#tableSelected_wrapper").removeClass("hideElement");
 }
 
 // Remove the formatting to get integer data for summation
@@ -329,7 +359,8 @@ function isValueStringInArray(value, array) {
  * añade los objetos a cuentas seleccionadas
  * @param {any} array arreglo de elemntos eliminados
  */
-function getCuentasPorPagarSelecciondas(array){
+function getCuentasPorPagarSelecciondas(array) {
+    warning = "";
     for (i = 0; i < array.length; i++) {
         obj = getCuenta(array[i], index);
         find = false;
@@ -337,12 +368,21 @@ function getCuentasPorPagarSelecciondas(array){
             obj2 = CuentasPorPagarSelecciondas[j];
             if (isEqualAccount(obj, obj2)) {
                 find = true;
+                warning += "la cuenta por pagar con el identificador " + obj.Index + " ya se encuentra seleccionada <br/>";
             }
         }
         if (!find) {
             CuentasPorPagarSelecciondas.push(obj);
             index++;
         }
+    }
+
+    if (warning != "") {
+        $("#validatedeExist").html(warning);
+        $("#validatedeExist").css('display', 'block');
+    }
+    else {
+        $("#validatedeExist").css('display', 'none');
     }
 }
 
@@ -370,18 +410,19 @@ function removeCuentasPorPagarSelecciondas(array) {
  */
 function getCuenta(array, index) {
     obj = {};
-    obj.Index = index;
-    obj.Sucursal = array[1];
-    obj.Identificacion = array[2];
-    obj.Nombre = array[3];
-    obj.CuentaContable = array[4];
-    obj.Documento = array[5];
-    obj.NumeroCuenta = array[6];
-    obj.FechaVencimiento = array[7];
-    obj.Comprobante = array[8];
-    obj.SaldoDocumento = array[9];
-    obj.Id = array[10];
-    obj.ValorPagar = obj.SaldoDocumento;
+    obj.Index = array[1];
+    obj.Sucursal = array[2];
+    obj.Identificacion = array[3];
+    obj.Nombre = array[4];
+    obj.CuentaContable = array[5];
+    obj.Documento = array[6];
+    obj.NumeroCuenta = array[7];
+    obj.FechaVencimiento = array[8];
+    obj.Comprobante = array[9];
+    obj.SaldoDocumento = array[10];
+    obj.Id = array[11];
+    obj.ValorPagar = array[12];
+    obj.IdSucursal = array[13];
     obj.ValorPagarInput = '<input class="form-control aling-right" type="text" id="' + obj.Index + 'ValorPagarI" name="" value="' + obj.ValorPagar + '"/>';
     return obj;
 }
@@ -470,19 +511,27 @@ function refreshDataCuentasPorPagarSelecciondas() {
 function sendForm(route) {
     toSend=refreshDataCuentasPorPagarSelecciondas();
     var data = new FormData();
+    console.log(toSend);
     data.append('TipoDocumento', $("#tipoDocumento").val());
     data.append('ProximoNumeroDisponible', $("#proximoNumeroDisponible").val());
     data.append('Fecha', $("#fecha").val());
     data.append('Detalle', $("#detalle").val());
+    console.log(toSend);
     data.append('ListCuentaPorPagar', JSON.stringify(toSend));
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', route, true);
-    xhr.onload = function () {
-        // do something to response
-        console.log(this.responseText);
-    };
-    xhr.send(data);
+    //var xhr = new XMLHttpRequest();
+    //xhr.open('POST', route, true);
+    //xhr.onload = function () {
+    //    // do something to response
+    //    //$(document).html(this.response);
+    //    console.log(this);
+    //    window.location = this.responseURL
+    //};
+    //xhr.send(data);
+    $("#jsonvalue").val(JSON.stringify(toSend));
+    $("#proximoNumeroDisponible").removeAttr("disabled");
+    $("#FromData").attr("action",route);
+    $("#FromData").submit();
 }
 
 /**
@@ -513,11 +562,11 @@ function validateForm() {
         messageErrorPrint = "";
         for (i = 0; i < CuentasPorPagarSelecciondas.length; i++) {
             CuentasPorPagarSelecciondas[i].ValorPagar = $("#" + CuentasPorPagarSelecciondas[i].Index + "ValorPagarI").val();
-            cuenta = CuentasPorPagarSelecciondas[i].CuentaContable;
+            cuenta = CuentasPorPagarSelecciondas[i].Index;
             numeroValorPagar = Math.abs(Number(CuentasPorPagarSelecciondas[i].ValorPagar.replace(/,/g, '')));
             numeroSaldoDocumento = Math.abs(Number(CuentasPorPagarSelecciondas[i].SaldoDocumento.replace(/,/g,'')));
-            if ( numeroValorPagar> numeroSaldoDocumento) {
-                errorMessageSelectedAccount.cuenta = cuenta;
+            if (numeroValorPagar > numeroSaldoDocumento) {
+                errorMessageSelectedAccount.index = cuenta;
                 messageErrorPrint += errorMessageSelectedAccount.invaldValue() + "<br/>";
                 retorno = false;
             }
@@ -528,6 +577,7 @@ function validateForm() {
     return retorno;
 }
 
+//gormatea los numeros 
 function formatNumbrer(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

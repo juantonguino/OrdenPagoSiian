@@ -13,10 +13,17 @@
         <button type="button" class="btn btn-primary"><i class="material-icons">add</i></button>
         <button type="button" class="btn btn-primary"><i class="material-icons">navigate_next</i></button>
         <button type="button" class="btn btn-primary"><i class="material-icons">last_page</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">save</i></button>
+        <button type="button" class="btn btn-primary" id="guardar"><i class="material-icons">save</i></button>
+        <button type="button" class="btn btn-primary" id="aprobar"><i class="material-icons">check</i></button>
+        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="material-icons">dehaze</i></button>
+        <div class="dropdown-menu">
+            <a class="dropdown-item" id="tercero" href="#">Por Tercero</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" id="total" href="#">Total</a>
+        </div>
     </div>
 </div>
-<!--<form>-->
+<form id="FromData" method="post">
 <div class="row">
     <!--Controles principales-->
     <div class="card col-md-7">
@@ -25,7 +32,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="tipoDocumento">Tipo Documento</label>
-                        <select class="form-control" id="tipoDocumento" name="tipoDocumento">
+                        <select class="form-control" id="tipoDocumento" name="TipoDocumento">
                             @foreach (string item in Model.ordenPago.TipoDocumento)
                             {
                                 <option value="@Html.DisplayFor(moelitem=> item)">@Html.DisplayFor(moelitem => item)</option>
@@ -37,7 +44,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="proximoNumeroDisponible">Próximo numero disponible</label>
-                        <input class="form-control" type="text" id="proximoNumeroDisponible" name="proximoNumeroDisponible" value="@Model.ordenPago.ProximoNumeroDisponible" disabled />
+                        <input class="form-control" type="text" id="proximoNumeroDisponible" name="ProximoNumeroDisponible" value="@Model.ordenPago.ProximoNumeroDisponible" disabled />
                     </div>
                 </div>
             </div>
@@ -45,14 +52,14 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="fecha">Fecha</label>
-                        <input class="form-control" type="date" id="fecha" name="fecha" value="@Convert.ToDateTime(Model.ordenPago.Fecha).ToString("yyyy-MM-dd")" />
+                        <input class="form-control" type="date" id="fecha" name="Fecha" value="@Convert.ToDateTime(Model.ordenPago.Fecha).ToString("yyyy-MM-dd")" />
                         <div id="validatefecha" class="invalid-feedback">Campo requerido.</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label" for="detalle">Detalle</label>
-                        <input class="form-control" type="text" id="detalle" name="detalle" value="@Model.ordenPago.Detalle" />
+                        <input class="form-control" type="text" id="detalle" name="Detalle" value="@Model.ordenPago.Detalle" />
                         <div id="validatedetalle" class="invalid-feedback">Campo requerido.</div>
                     </div>
                 </div>
@@ -177,6 +184,7 @@
                     <thead>
                         <tr>
                             <th></th>
+                            <th>Identificador</th>
                             <th>Sucursal</th>
                             <th>Identificación</th>
                             <th>Nombre</th>
@@ -187,6 +195,8 @@
                             <th>Comprobante</th>
                             <th>Saldo Documento</th>
                             <th>Id</th>
+                            <th>ValorPagar</th>
+                            <th>IdSucursal</th>
                         </tr>
                     </thead>
                     <tbody id="cuentaPagarFirst">
@@ -194,6 +204,7 @@
                         {
                             <tr>
                                 <td id="@Html.DisplayFor(modelitem =>i)cuentaPorPagar" class="cuentaPorPagar"></td>
+                                <td id="@Convert.ToString(i+1)identificador">@Convert.ToString(i + 1)</td>
                                 <td id="@Html.DisplayFor(modelitem =>i)Sucursal">@Model.ordenPago.ListCuentaPorPagar[i].Sucursal</td>
                                 <td id="@Html.DisplayFor(modelitem =>i)Identificacion">@Model.ordenPago.ListCuentaPorPagar[i].Identificacion</td>
                                 <td id="@Html.DisplayFor(modelitem =>i)Nombre">@Model.ordenPago.ListCuentaPorPagar[i].Nombre</td>
@@ -204,10 +215,23 @@
                                 <td id="@Html.DisplayFor(modelitem =>i)Comprobante">@Model.ordenPago.ListCuentaPorPagar[i].Comprobante</td>
                                 <td id="@Html.DisplayFor(modelitem =>i)SaldoDocumento">@Model.ordenPago.ListCuentaPorPagar[i].SaldoDocumento</td>
                                 <td id="@Html.DisplayFor(modelitem =>i)Id">@Model.ordenPago.ListCuentaPorPagar[i].Id</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Id">@Model.ordenPago.ListCuentaPorPagar[i].ValorPagar</td>
+                                <td id="@Html.DisplayFor(modelitem =>i)Id">@Model.ordenPago.ListCuentaPorPagar[i].IdSucursal</td>
                             </tr>
                         }
                     </tbody>
+                    <tfoot id="footerCuenta">
+                        <tr>
+                            <th colspan="2" style="text-align:right">Total Saldo de Documento:</th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
                 </table>
+            </div>
+            <div class="row">
+                <div id="validatedeExist" class="alert alert-warning" role="alert">
+                    This is a danger alert—check it out!
+                </div>
             </div>
             <br />
             <div class="row">
@@ -241,14 +265,17 @@
                     </tfoot>
                 </table>
             </div>
-            <div class="row">
-                <div id="validatedeselected" class="invalid-feedback">Campo requerido.</div>
-            </div>
-            <br/>
+            <br />
             <div class="col-md-1">
                 <div class="form-group">
                     <button id="quitarSecondSelecction" class="btn btn-warning">Quitar</button>
                 </div>
+            </div>
+            <div class="row">
+                <div id="validatedeselected" class="alert alert-danger" role="alert">
+                    This is a danger alert—check it out!
+                </div>
+                <input type="hidden" id="jsonvalue" name="ListCuentaPorPagar"/>
             </div>
         </div>
     </div>
@@ -279,4 +306,4 @@
     </div>
 </div>
 <!--Fin Controles Finales-->
-<!--</form>-->
+</form>

@@ -12,7 +12,8 @@ namespace OdenPago.Controllers
 {
     public class OrdenPagoController : Controller
     {
-        private OrdenPago _ordenPago = new OrdenPago {
+        private OrdenPago _ordenPago = new OrdenPago
+        {
             TipoDocumento = new string[] { "Tipo Documento 1", "Tipo Documento 2" },
             ProximoNumeroDisponible = 2134,
             Fecha = DateTime.Now,
@@ -20,6 +21,7 @@ namespace OdenPago.Controllers
             ListCuentaPorPagar = new List<CuentaPorPagar> {
                 new CuentaPorPagar {
                     Id=1,
+                    IdSucursal=12,
                     Sucursal="Pasto",
                     CuentaContable="Cuenta Contable1",
                     Documento="Documento 1",
@@ -28,9 +30,11 @@ namespace OdenPago.Controllers
                     Nombre="Nombre 1",
                     NumeroCuenta="12345",
                     SaldoDocumento="-30,000",
-                    Comprobante="comprobante 1"
+                    Comprobante="comprobante 1",
+                    ValorPagar="-30,000"
                 }, new CuentaPorPagar {
                     Id=2,
+                    IdSucursal=13,
                     Sucursal="Cali",
                     CuentaContable="Cuenta Contable2",
                     Documento="Documento 2",
@@ -39,9 +43,11 @@ namespace OdenPago.Controllers
                     Nombre="Nombre 2",
                     NumeroCuenta="12789",
                     SaldoDocumento="100,000",
-                    Comprobante="comprobante 2"
+                    Comprobante="comprobante 2",
+                    ValorPagar="100,000"
                 }, new CuentaPorPagar {
                     Id=3,
+                    IdSucursal=14,
                     Sucursal="Bogota",
                     CuentaContable="Cuenta Contable3",
                     Documento="Documento 3",
@@ -50,12 +56,13 @@ namespace OdenPago.Controllers
                     Nombre="Nombre 3",
                     NumeroCuenta="67890123",
                     SaldoDocumento="4,000,000",
-                    Comprobante="comprobante 3"
+                    Comprobante="comprobante 3",
+                    ValorPagar="4,000,000"
                 }
             }
         };
 
-        private string[] _sucursalesFilter= new string[] {"Pasto","Cali", "Bogotá"};
+        private string[] _sucursalesFilter = new string[] { "Pasto", "Cali", "Bogota" };
 
         // GET: OrdenPago
         public ActionResult Index()
@@ -76,28 +83,6 @@ namespace OdenPago.Controllers
         public ActionResult Create()
         {
             return View();
-        }
-
-        // POST: OrdenPago/Create
-        [HttpPost]
-        public ActionResult Create(FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add insert logic here
-                _ordenPago.TipoDocumento = new string[] { collection["TipoDocumento"] };
-                _ordenPago.ProximoNumeroDisponible = int.Parse(collection["ProximoNumeroDisponible"]);
-                _ordenPago.Fecha= DateTime.ParseExact(collection["Fecha"], "yyyy-MM-dd", CultureInfo.InvariantCulture); 
-                _ordenPago.Detalle=collection["Detalle"];
-                string tempCuentas = collection["ListCuentaPorPagar"];
-                List<CuentaPorPagar> resutlt = JsonConvert.DeserializeObject<List<CuentaPorPagar>>(tempCuentas);
-                _ordenPago.ListCuentaPorPagar = resutlt;
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
         }
 
         // GET: OrdenPago/Edit/5
@@ -142,6 +127,44 @@ namespace OdenPago.Controllers
             {
                 return View();
             }
+        }
+
+        [HttpPost]
+        public ActionResult Guardar(FormCollection collection)
+        {
+            try
+            {
+                // TODO: Add insert logic here
+                _ordenPago.TipoDocumento = new string[] { collection["TipoDocumento"] };
+                _ordenPago.ProximoNumeroDisponible = int.Parse(collection["ProximoNumeroDisponible"]);
+                _ordenPago.Fecha = DateTime.ParseExact(collection["Fecha"], "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                _ordenPago.Detalle = collection["Detalle"];
+                string tempCuentas = collection["ListCuentaPorPagar"];
+                List<CuentaPorPagar> resutlt = JsonConvert.DeserializeObject<List<CuentaPorPagar>>(tempCuentas);
+                _ordenPago.ListCuentaPorPagar = resutlt;
+                return RedirectToAction("Index", "Home");
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Aprobar(FormCollection collection)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public ActionResult GenerarTercero(FormCollection collection)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        [HttpPost]
+        public ActionResult GenerarTotal(FormCollection collection)
+        {
+            return RedirectToAction("Index", "Home");
         }
     }
 }
