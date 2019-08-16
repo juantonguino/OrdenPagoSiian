@@ -280,9 +280,37 @@ $(document).ready(() => {
         e.preventDefault();
         if (validateForm()) { sendForm("GenerarTercero");}
     });
-    $("#total").on('click',(e)=>{
+    $("#total").on('click', (e) => {
+        e.preventDefault();
         if (validateForm()) { sendForm("GenerarTotal"); }
     });
+
+    //controles parte baja
+
+    //controles de formulario
+    $("#guardarb").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("Guardar") }
+    });
+    $("#aprobarb").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("Aprobar"); }
+    });
+    $("#tercerob").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("GenerarTercero"); }
+    });
+    $("#totalb").on('click', (e) => {
+        e.preventDefault();
+        if (validateForm()) { sendForm("GenerarTotal"); }
+    });
+
+    $("firtsPage").on('click', (e) => { });
+    $("backPage").on('click',(e)=>{});
+    $("newPage").on('click',(e)=>{});
+    $("nextPage").on('click',(e)=>{});
+    $("lastPage").on('click',(e)=>{});
+
 
     //hide error selected
     $("#validatedeselected").css('display', 'none');

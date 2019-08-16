@@ -8,11 +8,11 @@
 <div class="fixed-top marginFloat" align="right">
     <div class="btn-group" role="group" aria-label="Basic example">
         <button type="button" class="btn btn-primary"><i class="material-icons">local_printshop</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">first_page</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">navigate_before</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">add</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">navigate_next</i></button>
-        <button type="button" class="btn btn-primary"><i class="material-icons">last_page</i></button>
+        <button type="button" class="btn btn-primary" id="firtsPage"><i class="material-icons">first_page</i></button>
+        <button type="button" class="btn btn-primary" id="backPage"><i class="material-icons">navigate_before</i></button>
+        <button type="button" class="btn btn-primary" id="newPage"><i class="material-icons">add</i></button>
+        <button type="button" class="btn btn-primary" id="nextPage"><i class="material-icons">navigate_next</i></button>
+        <button type="button" class="btn btn-primary" id="lastPage"><i class="material-icons">last_page</i></button>
         <button type="button" class="btn btn-primary" id="guardar"><i class="material-icons">save</i></button>
         <button type="button" class="btn btn-primary" id="aprobar"><i class="material-icons">check</i></button>
         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="material-icons">dehaze</i></button>
@@ -286,12 +286,12 @@
 <div class="row">
     <div class="col-md-1">
         <div class="form-group">
-            <button id="guardar" class="btn btn-info">Guardar</button>
+            <button id="guardarb" class="btn btn-info">Guardar</button>
         </div>
     </div>
     <div class="col-md-1">
         <div class="form-group">
-            <button id="aprobar" class="btn btn-success">Aprobar</button>
+            <button id="aprobarb" class="btn btn-success">Aprobar</button>
         </div>
     </div>
     <div class="col-md-1">
@@ -299,9 +299,9 @@
             Generar Orden de Pago
         </button>
         <div class="dropdown-menu">
-            <a class="dropdown-item" id="tercero" href="#">Por Tercero</a>
+            <a class="dropdown-item" id="tercerob" href="#">Por Tercero</a>
             <div class="dropdown-divider"></div>
-            <a class="dropdown-item"  id="total"href="#">Total</a>
+            <a class="dropdown-item"  id="totalb"href="#">Total</a>
         </div>
     </div>
 </div>
